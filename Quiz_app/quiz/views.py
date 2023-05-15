@@ -22,4 +22,9 @@ def home(request):
         return render(request, 'quiz/home.html', {})
 
 def logout_user(request):
-    pass
+    logout(request)
+    messages.succes(request, "You have been logged out")
+    return redirect('quiz:home')
+
+def register_user(request):
+    return render(request, 'quiz/register.html', {})
