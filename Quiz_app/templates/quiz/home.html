@@ -1,6 +1,6 @@
 <!-- To do -->
 <!-- Make base.html work and make warnings work -->
-{% block title %} Let's Quiz | Home {% endblock title %}
+{% extends 'quiz/base.html' %}
 {% block content %}
 
     {% if user.is_authenticated %}
