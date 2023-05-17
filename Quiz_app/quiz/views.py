@@ -42,3 +42,9 @@ def register_user(request):
         form = SignUpForm()
         return render(request, 'quiz/register.html', {'form':form})
     return render(request, 'quiz/register.html', {'form':form})
+
+def play(request):
+    return render(request, 'quiz/play.html', {})
+
+def create(request):
+    return render(request, 'quiz/create.html', {})

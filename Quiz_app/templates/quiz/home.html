@@ -9,11 +9,11 @@
     <div class="container">
       <div class="row">
         <div class="col-md-2">
-         <a href="" class="btn btn-primary btn-lg btn-huge" data-toggle="modal" data-target="#myModal">Start A Quiz</a>
+         <a href="{% url 'quiz:play' %}" class="btn btn-primary btn-lg btn-huge">Start A Quiz</a>
         </div>
       
         <div class="col-md-2">
-          <a href="" class="btn btn-primary btn-lg btn-huge">Create a Quiz</a>
+          <a href="{% url 'quiz:create' %}" class="btn btn-primary btn-lg btn-huge">Create a Quiz</a>
         </div> 
       </div>
     </div>
