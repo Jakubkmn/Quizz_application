@@ -1,12 +1,22 @@
 <!-- To do -->
-<!-- Make base.html work and make warnings work -->
+<!-- Make block next to each other-->
 {% extends 'quiz/base.html' %}
 {% block content %}
 
     {% if user.is_authenticated %}
 
-    <h1 class="display-1 text-info">Let's Quiz</h1>
-    
+    <h1 class="display-1 text-info">Hi {{ user.username }}</h1>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+         <a href="" class="btn btn-primary btn-lg btn-huge" data-toggle="modal" data-target="#myModal">Start A Quiz</a>
+        </div>
+      
+        <div class="col-md-2">
+          <a href="" class="btn btn-primary btn-lg btn-huge">Create a Quiz</a>
+        </div> 
+      </div>
+    </div>
     {% else %}
 
     <div class="signup-box">
@@ -20,7 +30,7 @@
                 <div class="form-group">
                   <input type="password" class="form-control" name="password" placeholder="Password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Login</button>
               </form>
         </form>
     </div>
