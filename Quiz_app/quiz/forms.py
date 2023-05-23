@@ -36,8 +36,8 @@ class QuizForm(forms.ModelForm):
         fields = ('name', 'topic', 'number_of_questions', 'time')
 
         widget = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'topic': forms.Textarea(attrs={'class': 'form-control'}),
-            'number_of_questions': forms.NumberInput(attrs={'class': 'form-control'}),
-            'time': forms.TimeInput(attrs={'class': 'form-control'})
+            'name': forms.TextInput(attrs={'class': 'quiz_name'}),
+            'topic': forms.Textarea(attrs={'class': 'quiz_topic'}),
+            'number_of_questions': forms.NumberInput(attrs={'class': 'question_num'}),
+            'time': forms.TimeInput(attrs={'class': 'time-control'})
         }

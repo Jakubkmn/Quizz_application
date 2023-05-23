@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm
+from .models import Quiz
+from .forms import QuizForm
 # Create your views here.
 
 
@@ -47,4 +49,22 @@ def play(request):
     return render(request, 'quiz/play.html', {})
 
 def create(request):
-    return render(request, 'quiz/create.html', {})
+    if request.method == 'POST':
+        form = QuizForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            topic = form.cleaned_data['topic']
+            num_of_questions = form.cleaned_data['number_of_questions']
+            time = form.cleaned_data['time']
+
+            new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions, time=time)
+            new_quiz.save()
+
+            return render(request, 'quiz/question_creator.html', {})
+    else:
+        form = QuizForm()
+        context = {
+            'form': form
+        }
+            
+    return render(request, 'quiz/create.html', context)
