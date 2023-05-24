@@ -48,7 +48,7 @@ def register_user(request):
 def play(request):
     return render(request, 'quiz/play.html', {})
 
-def create(request):
+def create_quiz(request):
     if request.method == 'POST':
         form = QuizForm(request.POST)
         if form.is_valid():

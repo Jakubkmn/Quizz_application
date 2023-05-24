@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Quiz
+from .models import Quiz, Question
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email Address'})) 
@@ -40,4 +40,14 @@ class QuizForm(forms.ModelForm):
             'topic': forms.Textarea(attrs={'class': 'quiz_topic'}),
             'number_of_questions': forms.NumberInput(attrs={'class': 'question_num'}),
             'time': forms.TimeInput(attrs={'class': 'time-control'})
+        }
+
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ('text', 'quiz')
+
+        widget = {
+            'text': forms.TextInput(attrs={'class': ''}),
+            'quiz': forms.Select(attrs={'class': ''}),
         }
