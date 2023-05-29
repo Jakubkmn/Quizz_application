@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django import forms
-from .models import Quiz, Question
+from .models import Quiz, Question, Answer
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(label="", widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'Email Address'})) 
@@ -48,6 +48,15 @@ class QuestionForm(forms.ModelForm):
         fields = ('text', 'quiz')
 
         widget = {
-            'text': forms.TextInput(attrs={'class': ''}),
-            'quiz': forms.Select(attrs={'class': ''}),
+            'text': forms.TextInput(attrs={'class': 'form-control'}),
+            'quiz': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+class AnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = {'text', 'correct'}
+        wigdets = {
+            'text': forms.TextInput(attrs={'class': 'form-control'}),
+            'correct': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }

@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm
+from django.forms import formset_factory
+from .forms import SignUpForm, QuizForm, QuestionForm, AnswerForm
 from .models import Quiz
-from .forms import QuizForm
+
 # Create your views here.
 
 
@@ -45,8 +46,37 @@ def register_user(request):
         return render(request, 'quiz/register.html', {'form':form})
     return render(request, 'quiz/register.html', {'form':form})
 
+def quiz_results(request):
+    return render(request, 'quiz/quiz_results.html', {})
+
 def play(request):
-    return render(request, 'quiz/play.html', {})
+    quizzes = Quiz.objects.all()
+
+    if request.method == 'POST':
+        quiz_id = request.POST.get('quiz_id')
+        return redirect('quiz:take_quiz', quiz_id=quiz_id)
+    return render(request, 'quiz/play.html', {'quizzes': quizzes})
+
+def take_quiz(request, quiz_id):
+    quiz = Quiz.objects.get(pk=quiz_id)
+    questions = quiz.question_set.all()
+    AnswerFormSet = formset_factory(AnswerForm, extra=len(questions))
+
+    if request.method == 'POST':
+        formset = AnswerFormSet(request.POST, prefix='answer')
+        if formset.is_valid():
+            for i, form in enumerate(formset):
+                answer = form.save(commit=False)
+                answer.question = questions[i]
+                answer.save()
+
+            return redirect('quiz:quiz_results', quiz_id=quiz.id)
+
+    else:
+        formset = AnswerFormSet(prefix='answer')
+
+    return render(request, 'quiz/take_quiz.html', {'quiz': quiz, 'questions': questions, 'formset': formset})
+
 
 def create_quiz(request):
     if request.method == 'POST':
@@ -60,7 +90,8 @@ def create_quiz(request):
             new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions, time=time)
             new_quiz.save()
 
-            return render(request, 'quiz/question_creator.html', {})
+            return redirect('quiz:create_question', quiz_id=new_quiz.id)
+            # return render(request, 'quiz/question_creator.html', {})
     else:
         form = QuizForm()
         context = {
@@ -68,3 +99,24 @@ def create_quiz(request):
         }
             
     return render(request, 'quiz/create.html', context)
+
+def create_question(request, quiz_id):
+    quiz = Quiz.objects.get(pk=quiz_id)
+    if request.method == 'POST':
+        num_questions = int(request.POST.get('number_of_questions', 0))
+        formset = formset_factory(QuestionForm, extra=num_questions)
+        formset = formset(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                question = form.save(commit=False)
+                question.quiz = quiz
+                question.save()
+
+            return redirect('quiz:home')
+
+    else:
+        num_questions = quiz.number_of_questions
+        formset = formset_factory(QuestionForm, extra=1)
+
+    return render(request, 'quiz/question_creator.html', {'formset': formset, 'quiz': quiz})
+
