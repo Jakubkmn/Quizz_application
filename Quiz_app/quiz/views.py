@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from .forms import SignUpForm, QuizForm, QuestionForm, AnswerForm
-from .models import Quiz
+from .models import Quiz, Question
 
 # Create your views here.
 
@@ -90,7 +90,8 @@ def create_quiz(request):
             new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions, time=time)
             new_quiz.save()
 
-            return redirect('quiz:create_question', quiz_id=new_quiz.id)
+            # return redirect(reverse('quiz:create_question') + f'?quiz_id={new_quiz.id}&num_of_q={num_of_questions}')
+            return redirect(reverse('quiz:create_question', args=[new_quiz.id]))
             # return render(request, 'quiz/question_creator.html', {})
     else:
         form = QuizForm()
@@ -101,6 +102,8 @@ def create_quiz(request):
     return render(request, 'quiz/create.html', context)
 
 def create_question(request, quiz_id):
+    # quiz_id = request.GET.get('quiz_id')
+    # num_of_q = request.GET.get('num_of_q')
     quiz = Quiz.objects.get(pk=quiz_id)
     if request.method == 'POST':
         num_questions = int(request.POST.get('number_of_questions', 0))
@@ -111,6 +114,18 @@ def create_question(request, quiz_id):
                 question = form.save(commit=False)
                 question.quiz = quiz
                 question.save()
+
+                question_instance = Question.objects.get(pk=question.pk)
+
+
+                num_answers = int(request.POST.get(f'answers_{question.pk}-TOTAL_FORMS', 0))
+                answer_formset = formset_factory(AnswerForm, extra=num_answers)
+                answer_formset = answer_formset(request.POST, prefix=f'answers_{question.pk}')
+                if answer_formset.is_valid():
+                    for answer_form in answer_formset:
+                        answer = answer_form.save(commit=False)
+                        answer.question = question_instance
+                        answer.save()
 
             return redirect('quiz:home')
 

@@ -55,8 +55,8 @@ class QuestionForm(forms.ModelForm):
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
-        fields = {'text', 'correct'}
-        wigdets = {
+        fields = ('text', 'correct')
+        wigdet = {
             'text': forms.TextInput(attrs={'class': 'form-control'}),
             'correct': forms.CheckboxInput(attrs={'class': 'form-check-input'})
         }
