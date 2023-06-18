@@ -6,7 +6,6 @@ class Quiz(models.Model):
     name = models.CharField(max_length=150)
     topic = models.CharField(max_length=120)
     number_of_questions = models.IntegerField()
-    time = models.IntegerField(help_text="Duration of the quiz ")
     
     def __str__(self):
         return f"{self.name}-{self.topic}"
@@ -18,9 +17,9 @@ class Quiz(models.Model):
         verbose_name_plural = 'Quizes'
 
 class Question(models.Model):
-    text = models.CharField(max_length=200)
+    question_text = models.CharField(max_length=200)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
+    question_number = models.IntegerField(default=0)
 
     def __str__(self):
         return str(self.text)
@@ -29,10 +28,9 @@ class Question(models.Model):
         return self.answer_set.all()
 
 class Answer(models.Model):
-    text = models.CharField(max_length=200)
+    answer_text = models.CharField(max_length=200)
     correct = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.question.text}, answer: {self.text}, correct: {self.correct}"

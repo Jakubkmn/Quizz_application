@@ -1,7 +1,21 @@
 {% extends 'quiz/base.html' %}
 {% block content %}
 
-<h2>Create a Question {{ num_of_q }}</h2>
+<form method="post">
+    {% csrf_token %}
+    
+    <h2>Create Questions</h2>
+    
+    {{ question_formset.management_form }}
+
+    {% for form in question_formset %}
+        {{ form.as_table }}
+    {% endfor %}
+  
+    <button type="submit">Create Questions</button>
+</form>
+
+<!-- <h2>Create a Question {{ num_of_q }}</h2>
 <div class="form-group">
     <form method="POST" action="{% url 'quiz:create_question' quiz_id=quiz.id %}">
         {% csrf_token %}
@@ -16,6 +30,6 @@
         {% endfor %}
     <button type="submit" class="btn btn-primary btn-lg btn-huge">Create</button>
     </form>
-</div>
+</div> -->
 
 {% endblock %}

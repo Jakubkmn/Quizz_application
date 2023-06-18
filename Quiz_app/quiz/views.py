@@ -85,13 +85,12 @@ def create_quiz(request):
             name = form.cleaned_data['name']
             topic = form.cleaned_data['topic']
             num_of_questions = form.cleaned_data['number_of_questions']
-            time = form.cleaned_data['time']
 
-            new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions, time=time)
+            new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions)
             new_quiz.save()
 
             # return redirect(reverse('quiz:create_question') + f'?quiz_id={new_quiz.id}&num_of_q={num_of_questions}')
-            return redirect(reverse('quiz:create_question', args=[new_quiz.id]))
+            return redirect('quiz:create_question', quiz_id=new_quiz.id, question_id=1)
             # return render(request, 'quiz/question_creator.html', {})
     else:
         form = QuizForm()
@@ -101,37 +100,45 @@ def create_quiz(request):
             
     return render(request, 'quiz/create.html', context)
 
-def create_question(request, quiz_id):
-    # quiz_id = request.GET.get('quiz_id')
-    # num_of_q = request.GET.get('num_of_q')
+def create_question(request, quiz_id, question_id):
     quiz = Quiz.objects.get(pk=quiz_id)
     if request.method == 'POST':
-        num_questions = int(request.POST.get('number_of_questions', 0))
-        formset = formset_factory(QuestionForm, extra=num_questions)
-        formset = formset(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                question = form.save(commit=False)
-                question.quiz = quiz
-                question.save()
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question_text = form.cleaned_data['question_text']
 
-                question_instance = Question.objects.get(pk=question.pk)
+            choice1 = form.cleaned_data["choice1_text"]
+            choice1_correctness = form.cleaned_data["choice1_correctness"]
 
+            choice2 = form.cleaned_data["choice2_text"]
+            choice2_correctness = form.cleaned_data["choice2_correctness"]
 
-                num_answers = int(request.POST.get(f'answers_{question.pk}-TOTAL_FORMS', 0))
-                answer_formset = formset_factory(AnswerForm, extra=num_answers)
-                answer_formset = answer_formset(request.POST, prefix=f'answers_{question.pk}')
-                if answer_formset.is_valid():
-                    for answer_form in answer_formset:
-                        answer = answer_form.save(commit=False)
-                        answer.question = question_instance
-                        answer.save()
+            choice3 = form.cleaned_data["choice3_text"]
+            choice3_correctness = form.cleaned_data["choice3_correctness"]
 
-            return redirect('quiz:home')
+            choice4 = form.cleaned_data["choice4_text"]
+            choice4_correctness = form.cleaned_data["choice4_correctness"]
 
+            question = Question(question_text=question_text, quiz=quiz, question_num=question_id)
+            question.save()
+
+            question.choice_set.create(choice_text=choice1, correct=choice1_correctness)
+            question.choice_set.create(choice_text=choice2, correct=choice2_correctness)
+            question.choice_set.create(choice_text=choice3, correct=choice3_correctness)
+            question.choice_set.create(choice_text=choice4, correct=choice4_correctness)
+
+            if question_id == quiz.number_of_questions:
+                return redirect('quiz:home')
+            else:
+                return redirect('quiz:create_question', quiz_id=quiz_id, question_id=question_id+1)
     else:
-        num_questions = quiz.number_of_questions
-        formset = formset_factory(QuestionForm, extra=1)
+        form = QuestionForm()
+        
 
-    return render(request, 'quiz/question_creator.html', {'formset': formset, 'quiz': quiz})
+    context = {
+        'quiz': quiz,
+        'question_formset': question_formset
+    }
+
+    return render(request, 'quiz/question_creator.html', context)
 

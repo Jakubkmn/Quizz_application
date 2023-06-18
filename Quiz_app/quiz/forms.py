@@ -33,29 +33,36 @@ class SignUpForm(UserCreationForm):
 class QuizForm(forms.ModelForm):
     class Meta:
         model = Quiz
-        fields = ('name', 'topic', 'number_of_questions', 'time')
-
+        fields = ('name', 'topic', 'number_of_questions')
         widget = {
             'name': forms.TextInput(attrs={'class': 'quiz_name'}),
             'topic': forms.Textarea(attrs={'class': 'quiz_topic'}),
             'number_of_questions': forms.NumberInput(attrs={'class': 'question_num'}),
-            'time': forms.TimeInput(attrs={'class': 'time-control'})
         }
 
 class QuestionForm(forms.ModelForm):
+    choice1_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
+    choice1_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
+
+    choice2_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
+    choice2_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
+
+    choice3_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
+    choice3_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
+
+    choice4_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
+    choice4_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
     class Meta:
         model = Question
-        fields = ('text', 'quiz')
-
-        widget = {
-            'text': forms.TextInput(attrs={'class': 'form-control'}),
-            'quiz': forms.Select(attrs={'class': 'form-control'}),
+        fields = ('question_text',)
+        widgets = {
+            'question_text': forms.TextInput(attrs={'class': 'form-control'})
         }
 
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
-        fields = ('text', 'correct')
+        fields = ('answer_text', 'correct')
         wigdet = {
             'text': forms.TextInput(attrs={'class': 'form-control'}),
             'correct': forms.CheckboxInput(attrs={'class': 'form-check-input'})
