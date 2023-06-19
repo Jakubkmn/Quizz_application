@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Quiz(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=150)
     topic = models.CharField(max_length=120)
     number_of_questions = models.IntegerField()
