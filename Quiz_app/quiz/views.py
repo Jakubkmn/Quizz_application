@@ -82,63 +82,66 @@ def create_quiz(request):
     if request.method == 'POST':
         form = QuizForm(request.POST)
         if form.is_valid():
-            name = form.cleaned_data['name']
-            topic = form.cleaned_data['topic']
-            num_of_questions = form.cleaned_data['number_of_questions']
+            new_quiz = form.save()
+            # name = form.cleaned_data['name']
+            # topic = form.cleaned_data['topic']
+            # num_of_questions = form.cleaned_data['number_of_questions']
 
-            new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions)
-            new_quiz.save()
+            # new_quiz = Quiz(name=name, topic=topic, number_of_questions=num_of_questions)
+            # new_quiz.save()
 
-            # return redirect(reverse('quiz:create_question') + f'?quiz_id={new_quiz.id}&num_of_q={num_of_questions}')
-            return redirect('quiz:create_question', quiz_id=new_quiz.id, question_id=1)
-            # return render(request, 'quiz/question_creator.html', {})
+            # return redirect('quiz:create_question', quiz_id=new_quiz.id)
+            return redirect('quiz:create_question', quiz_id=new_quiz.id)
     else:
         form = QuizForm()
         context = {
             'form': form
         }
             
-    return render(request, 'quiz/create.html', context)
+    return render(request, 'quiz/create_quiz.html', context)
 
-def create_question(request, quiz_id, question_id):
-    quiz = Quiz.objects.get(pk=quiz_id)
+def create_question(request, quiz_id):
+    quiz = Quiz.objects.get(id=quiz_id)
     if request.method == 'POST':
-        form = QuestionForm(request.POST)
+        form = QuestionForm(request.POST, instance=quiz)
         if form.is_valid():
-            question_text = form.cleaned_data['question_text']
+            form.save()
+            return redirect('quiz:home')
+            # question_text = form.cleaned_data['question_text']
 
-            choice1 = form.cleaned_data["choice1_text"]
-            choice1_correctness = form.cleaned_data["choice1_correctness"]
+            # choice1 = form.cleaned_data["choice1_text"]
+            # choice1_correctness = form.cleaned_data["choice1_correctness"]
 
-            choice2 = form.cleaned_data["choice2_text"]
-            choice2_correctness = form.cleaned_data["choice2_correctness"]
+            # choice2 = form.cleaned_data["choice2_text"]
+            # choice2_correctness = form.cleaned_data["choice2_correctness"]
 
-            choice3 = form.cleaned_data["choice3_text"]
-            choice3_correctness = form.cleaned_data["choice3_correctness"]
+            # choice3 = form.cleaned_data["choice3_text"]
+            # choice3_correctness = form.cleaned_data["choice3_correctness"]
 
-            choice4 = form.cleaned_data["choice4_text"]
-            choice4_correctness = form.cleaned_data["choice4_correctness"]
+            # choice4 = form.cleaned_data["choice4_text"]
+            # choice4_correctness = form.cleaned_data["choice4_correctness"]
 
-            question = Question(question_text=question_text, quiz=quiz, question_num=question_id)
-            question.save()
+            # question = Question(question_text=question_text, quiz=quiz, question_num=question_id)
+            # question.save()
 
-            question.choice_set.create(choice_text=choice1, correct=choice1_correctness)
-            question.choice_set.create(choice_text=choice2, correct=choice2_correctness)
-            question.choice_set.create(choice_text=choice3, correct=choice3_correctness)
-            question.choice_set.create(choice_text=choice4, correct=choice4_correctness)
+            # question.choice_set.create(choice_text=choice1, correct=choice1_correctness)
+            # question.choice_set.create(choice_text=choice2, correct=choice2_correctness)
+            # question.choice_set.create(choice_text=choice3, correct=choice3_correctness)
+            # question.choice_set.create(choice_text=choice4, correct=choice4_correctness)
 
-            if question_id == quiz.number_of_questions:
-                return redirect('quiz:home')
-            else:
-                return redirect('quiz:create_question', quiz_id=quiz_id, question_id=question_id+1)
+            # if question_id == quiz.number_of_questions:
+            #     return redirect('quiz:home')
+            # else:
+            #     next_question_id = question_id + 1
+            #     return redirect('quiz:create_question', quiz_id=quiz_id)
     else:
         form = QuestionForm()
         
 
     context = {
-        'quiz': quiz,
-        'question_formset': question_formset
+        'form': form
+        # 'question_num': question_id
     }
 
-    return render(request, 'quiz/question_creator.html', context)
+    return render(request, 'quiz/create_question.html', context)
 

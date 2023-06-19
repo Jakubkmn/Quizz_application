@@ -6,11 +6,7 @@
     
     <h2>Create Questions</h2>
     
-    {{ question_formset.management_form }}
-
-    {% for form in question_formset %}
-        {{ form.as_table }}
-    {% endfor %}
+    {{ form.question_text }}
   
     <button type="submit">Create Questions</button>
 </form>

@@ -31,14 +31,12 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
 
 class QuizForm(forms.ModelForm):
+    name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Quiz name", "class":"form-control"}), label="")
+    topic = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Topic", "class":"form-control"}), label="")
+    number_of_questions = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"number_of_question", "class":"form-control"}), label="")
     class Meta:
         model = Quiz
         fields = ('name', 'topic', 'number_of_questions')
-        widget = {
-            'name': forms.TextInput(attrs={'class': 'quiz_name'}),
-            'topic': forms.Textarea(attrs={'class': 'quiz_topic'}),
-            'number_of_questions': forms.NumberInput(attrs={'class': 'question_num'}),
-        }
 
 class QuestionForm(forms.ModelForm):
     choice1_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))

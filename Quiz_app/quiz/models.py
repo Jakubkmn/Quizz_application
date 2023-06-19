@@ -22,7 +22,7 @@ class Question(models.Model):
     question_number = models.IntegerField(default=0)
 
     def __str__(self):
-        return str(self.text)
+        return str(self.question_text)
     
     def get_answers(self):
         return self.answer_set.all()
@@ -33,7 +33,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.question.text}, answer: {self.text}, correct: {self.correct}"
+        return f"{self.question.question_text}, answer: {self.answer_text}, correct: {self.correct}"
 
 class Result(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
