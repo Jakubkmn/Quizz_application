@@ -60,10 +60,9 @@ def play(request):
 def take_quiz(request, quiz_id):
     quiz = Quiz.objects.get(pk=quiz_id)
     questions = quiz.question_set.all()
-    AnswerFormSet = formset_factory(AnswerForm, extra=len(questions))
-
+    AnswerFormSet = formset_factory(AnswerForm, extra=questions.question_number)
     if request.method == 'POST':
-        formset = AnswerFormSet(request.POST, prefix='answer')
+        formset = AnswerFormSet(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
                 answer = form.save(commit=False)
@@ -73,7 +72,7 @@ def take_quiz(request, quiz_id):
             return redirect('quiz:quiz_results', quiz_id=quiz.id)
 
     else:
-        formset = AnswerFormSet(prefix='answer')
+        formset = AnswerFormSet()
 
     return render(request, 'quiz/take_quiz.html', {'quiz': quiz, 'questions': questions, 'formset': formset})
 

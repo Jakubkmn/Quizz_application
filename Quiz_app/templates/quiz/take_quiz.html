@@ -2,33 +2,12 @@
 {% block content %}
 
 <h2>Take Quiz: {{quiz.name}}</h2>
-
 <form method="POST" action="">
     {% csrf_token %}
-
-    {% for question in quiz.question_set.all %}
-    <div class="question">
-        <h3>{{ question.text }}</h3>
-
-        {% for answer in question.get_answers %}
-        <input type="radio" name="question_{{ question.id }}" value="{{ answer.id }}">
-        <label>{{ answer.text }}</label><br>
-        {% endfor %}
-    
-        
-        <!-- {% for field in form %}
-          {{ field.label_tag }} {{ field }}
-          {% if field.errors %}
-            <ul class="errorlist">
-              {% for error in field.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endfor %} -->
-      </div>
+    {{ formset.management_form }}
+    {% for form in formset %}
+      {{ form.as_p }}
     {% endfor %}
-
     <button type="submit">Submit Answers</button>
 </form>
 {% endblock %}

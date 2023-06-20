@@ -39,6 +39,7 @@ class QuizForm(forms.ModelForm):
         fields = ('name', 'topic', 'number_of_questions')
 
 class QuestionForm(forms.ModelForm):
+    question_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'form-control'}))
     choice1_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
     choice1_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
 
@@ -53,15 +54,8 @@ class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
         fields = ('question_text',)
-        widgets = {
-            'question_text': forms.TextInput(attrs={'class': 'form-control'})
-        }
 
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
-        fields = ('answer_text', 'correct')
-        wigdet = {
-            'text': forms.TextInput(attrs={'class': 'form-control'}),
-            'correct': forms.CheckboxInput(attrs={'class': 'form-check-input'})
-        }
+        fields = ('correct', 'question')
