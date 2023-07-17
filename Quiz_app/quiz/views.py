@@ -4,7 +4,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from .forms import SignUpForm, QuizForm, QuestionForm, AnswerForm
-from .models import Quiz, Question
+from .models import Quiz, Question, Answer
 
 # Create your views here.
 
@@ -60,7 +60,7 @@ def play(request):
 def take_quiz(request, quiz_id):
     quiz = Quiz.objects.get(pk=quiz_id)
     questions = quiz.question_set.all()
-    AnswerFormSet = formset_factory(AnswerForm, extra=questions.question_number)
+    AnswerFormSet = formset_factory(AnswerForm, extra=len(questions))
     if request.method == 'POST':
         formset = AnswerFormSet(request.POST)
         if formset.is_valid():
@@ -68,7 +68,6 @@ def take_quiz(request, quiz_id):
                 answer = form.save(commit=False)
                 answer.question = questions[i]
                 answer.save()
-
             return redirect('quiz:quiz_results', quiz_id=quiz.id)
 
     else:
@@ -102,6 +101,12 @@ def create_question(request, quiz_id):
                 question = form.save(commit=False)
                 question.quiz = quiz
                 question.save()
+
+                for i in range(1, 5):
+                    choice_text = form.cleaned_data.get(f'choice{i}_text')
+                    choice_correctness = form.cleaned_data.get(f'choice{i}_correctness')
+                    if choice_text:
+                        Answer.objects.create(answer_text=choice_text, correct=choice_correctness, question=question)
             return redirect('quiz:home')
     else:
         formset = QuestionFormSet()
