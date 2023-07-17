@@ -1,11 +1,14 @@
 from django.urls import path
-from .views import CustomLoginView, QuizList
+from .views import CustomLoginView, QuizList, QuizDetailView, QuizCreateView
 
 app_name = 'quiz'
 
 urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
-    path('', QuizList.as_view(), name='quizes')
+    path('', QuizList.as_view(), name='quizes'),
+    path('quiz/<int:pk>/', QuizDetailView.as_view(), name='quiz'),
+    path('quiz-create/', QuizCreateView.as_view(), name='quiz-create')
+
     # path('login/', views.login_user, name='login'),
     # path('logout/', views.logout_user, name='logout'),
     # path('register/', views.register_user, name='register'),
