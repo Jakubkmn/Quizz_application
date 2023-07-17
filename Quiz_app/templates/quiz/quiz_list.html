@@ -1,0 +1,20 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+
+    <h1 class="display-1 text-info">Hi {{ user.username }}</h1>
+    <a href="{% url 'quiz:quiz-create' %}">Add Quiz</a>
+    <table>
+        <tr>
+            <th>Item</th>
+            <th></th>
+        </tr>
+        {% for quiz in quizes %}
+        <tr>
+            <td>{{quiz.name}}</td>
+            <td><a href="{% url 'quiz:quiz' quiz.id %}">View</a></td>
+        </tr>
+        {% empty %}
+        <h3>No quizes</h3>
+        {% endfor %}
+    </table>
+{% endblock %}

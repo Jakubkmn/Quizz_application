@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+import random
 
 # Create your models here.
 class Quiz(models.Model):
-    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=150)
     topic = models.CharField(max_length=120)
     number_of_questions = models.IntegerField()
@@ -12,7 +12,9 @@ class Quiz(models.Model):
         return f"{self.name}-{self.topic}"
 
     def get_questions(self):
-        return self.question_set.all()[:self.number_of_questions]
+        questions = list(self.question_set.all())
+        random.shuffle(questions)
+        return questions[:self.number_of_questions]
 
     class Meta:
         verbose_name_plural = 'Quizes'
@@ -20,7 +22,7 @@ class Quiz(models.Model):
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    question_number = models.IntegerField(default=0)
+    created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.question_text)
