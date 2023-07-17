@@ -1,29 +1,41 @@
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
-from django.forms import formset_factory
-from .forms import SignUpForm, QuizForm, QuestionForm, AnswerForm
+from django.urls import reverse_lazy
+# from .forms import SignUpForm, QuizForm, QuestionForm, AnswerForm
 from .models import Quiz, Question, Answer
+from django.contrib.auth.views import LoginView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 
 # Create your views here.
+class CustomLoginView(LoginView):
+    template_name = 'quiz/login.html'
+    fiels = '__all__'
+    redirect_authenticated_user = True
 
+    def get_success_url(self):
+        return reverse_lazy('quzies')
 
-def home(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+class QuizList(ListView):
+    model = Quiz
+    context_object_name = 'quizes'
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
-            messages.success(request, "You have been logged in!")
-            return redirect('quiz:home')
-        else:
-            messages.success(request, "There was an error logging in. Please try again")
-            return redirect('quiz:home')
-    else:
-        return render(request, 'quiz/home.html', {'user': request.user})
+# def home(request):
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+
+#         user = authenticate(request, username=username, password=password)
+#         if user is not None:
+#             login(request, user)
+#             messages.success(request, "You have been logged in!")
+#             return redirect('quiz:home')
+#         else:
+#             messages.success(request, "There was an error logging in. Please try again")
+#             return redirect('quiz:home')
+#     else:
+#         return render(request, 'quiz/home.html', {'user': request.user})
 
 def logout_user(request):
     logout(request)
@@ -46,69 +58,69 @@ def register_user(request):
         return render(request, 'quiz/register.html', {'form':form})
     return render(request, 'quiz/register.html', {'form':form})
 
-def quiz_results(request):
-    return render(request, 'quiz/quiz_results.html', {})
+# def quiz_results(request):
+#     return render(request, 'quiz/quiz_results.html', {})
 
-def play(request):
-    quizzes = Quiz.objects.all()
+# def play(request):
+#     quizzes = Quiz.objects.all()
 
-    if request.method == 'POST':
-        quiz_id = request.POST.get('quiz_id')
-        return redirect('quiz:take_quiz', quiz_id=quiz_id)
-    return render(request, 'quiz/play.html', {'quizzes': quizzes})
+#     if request.method == 'POST':
+#         quiz_id = request.POST.get('quiz_id')
+#         return redirect('quiz:take_quiz', quiz_id=quiz_id)
+#     return render(request, 'quiz/play.html', {'quizzes': quizzes})
 
-def take_quiz(request, quiz_id):
-    quiz = Quiz.objects.get(pk=quiz_id)
-    questions = quiz.question_set.all()
-    AnswerFormSet = formset_factory(AnswerForm, extra=len(questions))
-    if request.method == 'POST':
-        formset = AnswerFormSet(request.POST)
-        if formset.is_valid():
-            for i, form in enumerate(formset):
-                answer = form.save(commit=False)
-                answer.question = questions[i]
-                answer.save()
-            return redirect('quiz:quiz_results', quiz_id=quiz.id)
+# def take_quiz(request, quiz_id):
+#     quiz = Quiz.objects.get(pk=quiz_id)
+#     questions = quiz.question_set.all()
+#     AnswerFormSet = formset_factory(AnswerForm, extra=len(questions))
+#     if request.method == 'POST':
+#         formset = AnswerFormSet(request.POST)
+#         if formset.is_valid():
+#             for i, form in enumerate(formset):
+#                 answer = form.save(commit=False)
+#                 answer.question = questions[i]
+#                 answer.save()
+#             return redirect('quiz:quiz_results', quiz_id=quiz.id)
 
-    else:
-        formset = AnswerFormSet()
+#     else:
+#         formset = AnswerFormSet()
 
-    return render(request, 'quiz/take_quiz.html', {'quiz': quiz, 'questions': questions, 'formset': formset})
+#     return render(request, 'quiz/take_quiz.html', {'quiz': quiz, 'questions': questions, 'formset': formset})
 
 
-def create_quiz(request):
-    if request.method == 'POST':
-        form = QuizForm(request.POST)
-        if form.is_valid():
-            new_quiz = form.save()
-            print(new_quiz.id)
-            return redirect('quiz:create_question', quiz_id=new_quiz.id)
-    else:
-        form = QuizForm()
-    context = {
-        'form': form
-    }
+# def create_quiz(request):
+#     if request.method == 'POST':
+#         form = QuizForm(request.POST)
+#         if form.is_valid():
+#             new_quiz = form.save()
+#             print(new_quiz.id)
+#             return redirect('quiz:create_question', quiz_id=new_quiz.id)
+#     else:
+#         form = QuizForm()
+#     context = {
+#         'form': form
+#     }
 
-    return render(request, 'quiz/create_quiz.html', context)
+#     return render(request, 'quiz/create_quiz.html', context)
 
-def create_question(request, quiz_id):
-    quiz = get_object_or_404(Quiz, id=quiz_id)
-    QuestionFormSet = formset_factory(QuestionForm, extra=quiz.number_of_questions)
-    if request.method == 'POST':
-        formset = QuestionFormSet(request.POST)
-        if formset.is_valid():
-            for form in formset:
-                question = form.save(commit=False)
-                question.quiz = quiz
-                question.save()
+# def create_question(request, quiz_id):
+#     quiz = get_object_or_404(Quiz, id=quiz_id)
+#     QuestionFormSet = formset_factory(QuestionForm, extra=quiz.number_of_questions)
+#     if request.method == 'POST':
+#         formset = QuestionFormSet(request.POST)
+#         if formset.is_valid():
+#             for form in formset:
+#                 question = form.save(commit=False)
+#                 question.quiz = quiz
+#                 question.save()
 
-                for i in range(1, 5):
-                    choice_text = form.cleaned_data.get(f'choice{i}_text')
-                    choice_correctness = form.cleaned_data.get(f'choice{i}_correctness')
-                    if choice_text:
-                        Answer.objects.create(answer_text=choice_text, correct=choice_correctness, question=question)
-            return redirect('quiz:home')
-    else:
-        formset = QuestionFormSet()
-    return render(request, 'quiz/create_question.html', {'formset': formset})
+#                 for i in range(1, 5):
+#                     choice_text = form.cleaned_data.get(f'choice{i}_text')
+#                     choice_correctness = form.cleaned_data.get(f'choice{i}_correctness')
+#                     if choice_text:
+#                         Answer.objects.create(answer_text=choice_text, correct=choice_correctness, question=question)
+#             return redirect('quiz:home')
+#     else:
+#         formset = QuestionFormSet()
+#     return render(request, 'quiz/create_question.html', {'formset': formset})
 

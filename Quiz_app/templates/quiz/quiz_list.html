@@ -1,0 +1,30 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+
+    <h1 class="display-1 text-info">Hi {{ user.username }}</h1>
+
+    <table>
+        <tr>
+            <th>Item</th>
+        </tr>
+        {% for quiz in quizes %}
+        <tr>
+            <th>{{quiz.name}}</th>
+        </tr>
+        {% empty %}
+        <h3>No quizes</h3>
+        {% endfor %}
+    </table>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-2">
+         <a href="" class="btn btn-primary btn-lg btn-huge">Start A Quiz</a>
+        </div>
+      
+        <div class="col-md-2">
+          <a href="" class="btn btn-primary btn-lg btn-huge">Create a Quiz</a>
+        </div> 
+      </div>
+    </div>
+
+{% endblock %}
