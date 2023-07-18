@@ -1,0 +1,17 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+
+<h3>Quiz Form</h3>
+
+<form method="POST">
+    {% csrf_token %}
+    {{form.as_p}}
+    <input type="submit" value="submit">
+</form>
+
+    {% for question in questions %}
+        <a href="">{{question.text}}</a>
+    {% empty %}
+        <p>You haven't created any questions yet. Create them <a href="{% url 'quiz:question-add' quiz.pk %}">Add Questions</a></p>
+    {% endfor %}
+{% endblock %}
