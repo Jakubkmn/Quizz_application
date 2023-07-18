@@ -1,0 +1,17 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+
+<h3>{{quiz.name}}</h3>
+<h2>{{question.question_text}}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{formset.managment_form}}
+</form>
+
+{% for form in formset %}
+    {{form.answer_text}}
+    {{form.correct}}
+{% endfor %}
+<input type="submit" value="submit">
+{% endblock %}
