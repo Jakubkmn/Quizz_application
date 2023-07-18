@@ -1,0 +1,11 @@
+{% extends 'quiz/base.html' %}
+{% block content %}
+
+<a href="{% url 'quiz:quizes' %}"></a>
+<form method="POST">
+    {% csrf_token %}
+    <p>Are you're sure you want to delete this quiz? "{{quizes}}"</p>
+    <input type="submit" value="Delete"/>
+</form>
+
+{% endblock %}

@@ -12,6 +12,8 @@
         <tr>
             <td>{{quiz.name}}</td>
             <td><a href="{% url 'quiz:quiz' quiz.id %}">View</a></td>
+            <td><a href="{% url 'quiz:quiz-update' quiz.id %}">Edit</a></td>
+            <td><a href="{% url 'quiz:quiz-delete' quiz.id %}">Delete</a></td>
         </tr>
         {% empty %}
         <h3>No quizes</h3>
