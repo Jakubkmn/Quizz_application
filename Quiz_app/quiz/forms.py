@@ -30,32 +30,7 @@ class SignUpForm(UserCreationForm):
         self.fields['password2'].label = ''
         self.fields['password2'].help_text = '<span class="form-text text-muted"><small>Enter the same password as before, for verification.</small></span>'
 
-# class QuizForm(forms.ModelForm):
-#     name = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Quiz name", "class":"form-control"}), label="")
-#     topic = forms.CharField(required=True, widget=forms.widgets.TextInput(attrs={"placeholder":"Topic", "class":"form-control"}), label="")
-#     number_of_questions = forms.IntegerField(required=True, widget=forms.widgets.NumberInput(attrs={"placeholder":"number_of_question", "class":"form-control"}), label="")
-#     class Meta:
-#         model = Quiz
-#         fields = ('name', 'topic', 'number_of_questions')
-
-# class QuestionForm(forms.ModelForm):
-#     question_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'form-control'}))
-#     choice1_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
-#     choice1_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
-
-#     choice2_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
-#     choice2_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
-
-#     choice3_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
-#     choice3_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
-
-#     choice4_text = forms.CharField(max_length=300, label="", widget=forms.TextInput(attrs={'class': 'choice_box'}))
-#     choice4_correctness = forms.BooleanField(label="", required=False, widget=forms.CheckboxInput(attrs={'class': 'choice_correct_box'}))
-#     class Meta:
-#         model = Question
-#         fields = ('question_text',)
-
-# class AnswerForm(forms.ModelForm):
-#     class Meta:
-#         model = Answer
-#         fields = ('answer_text','correct', 'question')
+class QuestionForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ['question_text']
