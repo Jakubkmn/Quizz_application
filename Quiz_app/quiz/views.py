@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404, reverse
+
 from django.contrib import messages
-from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required 
+
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -9,8 +12,10 @@ from django.urls import reverse_lazy
 from django.db.models import Count
 from django.db import transaction
 from django.forms import inlineformset_factory
+
 from .forms import QuestionForm, BaseAnswerInlineFormSet
 from .models import Quiz, Question, Answer
+
 
 # Create your views here.
 class CustomLoginView(LoginView):
@@ -19,18 +24,18 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        return reverse_lazy('quizes')
+        return reverse_lazy('quiz:quizes')
 
-class QuizList(ListView):
+class QuizList(LoginRequiredMixin, ListView):
     model = Quiz
     context_object_name = 'quizes'
 
-class QuizDetailView(DetailView):
+class QuizDetailView(LoginRequiredMixin, DetailView):
     model = Quiz
     context_object_name = 'quiz'
     template_name = 'quiz/quiz.html'
 
-class QuizCreateView(CreateView):
+class QuizCreateView(LoginRequiredMixin, CreateView):
     model = Quiz
     fields = '__all__'
 
@@ -39,10 +44,11 @@ class QuizCreateView(CreateView):
         quiz.save()
         return redirect('quiz:quiz-update', quiz.pk)
     
-class QuizUpdateView(UpdateView):
+class QuizUpdateView(LoginRequiredMixin, UpdateView):
     model = Quiz
     fields = '__all__'
     template_name = 'quiz/quiz_change_form.html'
+    context_object_name = 'quiz'
 
     def get_context_data(self, **kwargs):
         kwargs['questions'] = self.get_object().question_set.annotate(answer_count=Count('answer'))
@@ -51,23 +57,25 @@ class QuizUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('quiz:quiz-update', kwargs={'pk': self.object.pk})
 
-class QuizDeleteView(DeleteView):
+class QuizDeleteView(LoginRequiredMixin, DeleteView):
     model = Quiz
     context_object_name = 'quiz'
     success_url = reverse_lazy('quiz:quizes')
 
-class QuestionCreateView(CreateView):
+class QuestionCreateView(LoginRequiredMixin, CreateView):
     model = Question
     fields = ['question_text']
     template_name = 'quiz/question_add_form.html'
 
     def form_valid(self, form):
         form.instance.quiz = get_object_or_404(Quiz, pk=self.kwargs['pk'])
+        messages.success(self.request, "You may now add answers to the question.")
         return super().form_valid(form)
     
     def get_success_url(self):
         return reverse_lazy('quiz:question-change', kwargs={'pk': self.object.quiz.pk, 'question_pk': self.object.pk})
 
+@login_required
 def question_change(request, pk, question_pk):
     quiz = get_object_or_404(Quiz, pk=pk)
     question = get_object_or_404(Question, pk=question_pk, quiz=quiz)

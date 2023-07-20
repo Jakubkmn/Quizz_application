@@ -2,16 +2,21 @@
 {% block content %}
 
 <h3>Quiz Form</h3>
-
-<form method="POST">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="submit">
-</form>
-
+<div class="btn-group" role="group" aria-label="Basic example">
+    <form method="POST">
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" value="Save" class="btn btn-secondary">
+        <a href="{% url 'quiz:quizes' %}" class="btn btn-outline-secondary">Go Back</a>
+    </form>
+</div>
+    
+<div class="list-group">
     {% for question in questions %}
-        <a href="">{{question.text}}</a>
+        <a href="{% url 'quiz:question-change' quiz.pk question.pk%}" class="col-5 list-group-item">{{question.question_text}}</a>
+        {{question.answer_count}}
     {% empty %}
+</div>
         <p>You haven't created any questions yet. Create them <a href="{% url 'quiz:question-add' quiz.pk %}">Add Questions</a></p>
     {% endfor %}
 {% endblock %}

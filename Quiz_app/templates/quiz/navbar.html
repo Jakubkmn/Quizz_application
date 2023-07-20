@@ -7,14 +7,14 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         
-        {% if user.is_authenticated %}
+        {% if request.user.is_authenticated %}
         <li class="nav-item">
-            
+            <a class="nav-link" href="{% url 'quiz:logout' %}">Logout</a>
         </li>
 
         {% else %}
         <li class="nav-item">
-            
+            <a class="nav-link" href="">Register</a>
         </li>
 
         <li class="nav-item">

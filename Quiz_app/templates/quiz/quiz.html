@@ -3,4 +3,11 @@
 
 <h1>Quiz: {{quiz}}</h1>
 
+{% for question in quiz.question_set.all %}
+    <p>{{question.question_text}}</p>
+{% empty %}
+    <p>There is no questions</p>
+    <a href="{% url 'quiz:question-add' quiz.pk %}">Add Questions</a>
+{% endfor%}
+<a href="{% url 'quiz:quizes' %}">Go Back</a>
 {% endblock %}

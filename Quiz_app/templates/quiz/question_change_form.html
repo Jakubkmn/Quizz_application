@@ -13,7 +13,6 @@
 {% for error in formset.non_form_errors %}
     <p>{{error}}</p>
 {% endfor %}
-
 {% for form in formset %}
     {{form.answer_text}}
     {{form.correct}}

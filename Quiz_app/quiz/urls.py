@@ -1,10 +1,12 @@
 from django.urls import path
 from .views import CustomLoginView, QuizList, QuizDetailView, QuizCreateView, QuizUpdateView, QuizDeleteView, QuestionCreateView, question_change
+from django.contrib.auth.views import LogoutView
 
 app_name = 'quiz'
 
 urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='quiz:login'), name='logout'),
     path('', QuizList.as_view(), name='quizes'),
     path('quiz/<int:pk>/', QuizDetailView.as_view(), name='quiz'),
     path('quiz/create/', QuizCreateView.as_view(), name='quiz-create'),
