@@ -9,18 +9,8 @@ from django.urls import reverse_lazy
 from django.db.models import Count
 from django.db import transaction
 from django.forms import inlineformset_factory
-from .forms import QuestionForm
+from .forms import QuestionForm, BaseAnswerInlineFormSet
 from .models import Quiz, Question, Answer
-
-AnswerFormSet = inlineformset_factory(
-    Question,
-    Answer,
-    fields=('answer_text', 'correct'),
-    min_num=2,
-    validate_min=True,
-    max_num=10,
-    validate_max=True
-)
 
 # Create your views here.
 class CustomLoginView(LoginView):
@@ -78,36 +68,38 @@ class QuestionCreateView(CreateView):
     def get_success_url(self):
         return reverse_lazy('quiz:question-change', kwargs={'pk': self.object.quiz.pk, 'question_pk': self.object.pk})
 
-class QuestionUpdateView(UpdateView):
-    model = Question
-    template_name = 'quiz/question_change_form.html'
-    form_class = QuestionForm
-    context_object_name = 'question'
+def question_change(request, pk, question_pk):
+    quiz = get_object_or_404(Quiz, pk=pk)
+    question = get_object_or_404(Question, pk=question_pk, quiz=quiz)
 
-    def get_object(self, queryset=None):
-        quiz = get_object_or_404(Quiz, pk=self.kwargs['pk'])
-        question = get_object_or_404(Question, pk=self.kwargs['question_pk'], quiz=quiz)
-        return question
+    AnswerFormSet = inlineformset_factory(
+    Question,
+    Answer,
+    formset=BaseAnswerInlineFormSet,
+    fields=('answer_text', 'correct'),
+    min_num=2,
+    validate_min=True,
+    max_num=10,
+    validate_max=True
+    )
 
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        if self.request.POST:
-            data['formset'] = AnswerFormSet(self.request.POST, instance=self.object)
-        else:
-            data['formset'] = AnswerFormSet(instance=self.object)
-        data['quiz'] = get_object_or_404(Quiz, pk=self.kwargs['pk'])
-        return data
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        formset = context['formset']
-        with transaction.atomic():
-            self.object = form.save()
-
-            if formset.is_valid():
-                formset.instance = self.object
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        formset = AnswerFormSet(request.POST, instance=question)
+        if form.is_valid() and formset.is_valid():
+            with transaction.atomic():
+                form.save()
                 formset.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        reverse_lazy('quiz:quiz-update', kwargs={'pk': self.object.quiz.pk})
+            messages.success(request, 'Question and answers saved with success!')
+            return redirect('quiz:quiz-update', quiz.pk)
+    else:
+        form = QuestionForm(instance=question)
+        formset = AnswerFormSet(instance=question)
+    
+    return render(request, 'quiz/question_change_form.html', {
+        'quiz': quiz,
+        'question': question,
+        'form': form,
+        'formset': formset
+    })
+    

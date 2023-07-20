@@ -6,12 +6,18 @@
 
 <form method="POST">
     {% csrf_token %}
-    {{formset.managment_form}}
-</form>
+    {{formset.management_form}}
+    {{form}}
+
+
+{% for error in formset.non_form_errors %}
+    <p>{{error}}</p>
+{% endfor %}
 
 {% for form in formset %}
     {{form.answer_text}}
     {{form.correct}}
 {% endfor %}
 <input type="submit" value="submit">
+</form>
 {% endblock %}
