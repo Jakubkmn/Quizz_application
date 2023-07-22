@@ -4,10 +4,12 @@ from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 from django.db.models import Count
 from django.db import transaction
@@ -26,9 +28,37 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         return reverse_lazy('quiz:quizes')
 
+class RegisterPage(FormView):
+    template_name = 'quiz/register.html'
+    form_class = UserCreationForm
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        user = form.save()
+        if user is not None:
+            login(self.request, user)
+        return super(RegisterPage, self).form_valid(form)
+
+    def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect('quiz:quizes')
+        return super(RegisterPage, self).get(*args, **kwargs)
+
+    def get_success_url(self):
+        return reverse_lazy('quiz:quizes')
+
 class QuizList(LoginRequiredMixin, ListView):
     model = Quiz
     context_object_name = 'quizes'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_input = self.request.GET.get('search-area') or ''
+        if search_input:
+            context['quizes'] = context['quizes'].filter(name__startswith=search_input)
+
+        context['search-input'] = search_input
+        return context
 
 class QuizDetailView(LoginRequiredMixin, DetailView):
     model = Quiz
@@ -90,7 +120,7 @@ def question_change(request, pk, question_pk):
     max_num=10,
     validate_max=True
     )
-
+  
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
         formset = AnswerFormSet(request.POST, instance=question)
